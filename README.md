@@ -8,13 +8,13 @@ maintained by [opentileserver.org](https://opentileserver.org)
 After searching an easy way to install a tile server, we found the project
 [OpenTileServer](https://github.com/AcuGIS/OpenTileServer) which was what
 we needed.
-The script was writen for Ubuntu but sadly not compatilbie with our main
-deployed distribution, namely Debian, so we decided to write our own script.
+The script was writen for Ubuntu but sadly not compatible with our main
+used distribution, namely Debian, so we decided to write our own script.
 
-As Debian has default package for the mapnik style and rendering/serving
+As Debian has default packages for the mapnik style and rendering/serving
 tiles, the script is more simplier than the Ubuntu version
 
-The uses tools are
+The used tools are
 
     -Tilestache
     -Default mapnik style
@@ -36,6 +36,11 @@ in default context (barbone Debian Stretch install).
 
 {pbf_url}: Complete PBF url from GeoFabrik (or other source)
 </code>
+
+## OSM data update
+The data are updated via osmosis, the tool is executed once a day with
+a cron job. The updated will be downloaded and mergeed in the database (experimental
+state for the moment)
 
 ## Tile server
 When the installation is finished, a demo page is available under
