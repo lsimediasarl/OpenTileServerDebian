@@ -12,7 +12,7 @@
 # to render the tiles directly via apache2
 #
 # The database will be stored under the defined user ("osm" by default) and the
-# tiles will be store  in the user home at /home/{user}/www/tiles
+# tiles will be stored in the user home at /home/{user}/www/tiles
 #
 # The script must be run as root
 #
