@@ -23,8 +23,8 @@ The used tools are
     -Leaflet demo page
 
 ## Debian version
-Only tested under Debian 9 (stretch), some package could be missing under other
-release
+Only tested under Debian 9 (stretch), some packages could be missing under other
+releases
 
 ## Release
 The script is an early stage and is in a work in progress sate, but it work well
@@ -39,8 +39,9 @@ in default context (barbone Debian Stretch install).
 
 ## OSM data update
 The data are updated via osmosis, the tool is executed once a day with
-a cron job. The updated will be downloaded and mergeed in the database (experimental
-state for the moment)
+a cron job. The updated data will be downloaded and merged in the database
+
+( **experimental feature for the moment** )
 
 ## Tile server
 When the installation is finished, a demo page is available under
