@@ -1,11 +1,8 @@
 # Open tile server for Debian
-Debian stretch script to install an OpenStreetMap tile server using
+Debian stretch script to install an OpenStreetMap tile.
 
-    -Tilestache
-    -Default mapnik style
-    -Postgres
-    -Apache2
-    -Leaflet demo page
+For Ubuntu version check [OpenTileServer](https://github.com/AcuGIS/OpenTileServer)
+maintained by [opentileserver.org](https://opentileserver.org)
 
 ## Introduction
 After searching an easy way to install a tile server, we found the project
@@ -17,9 +14,21 @@ deployed distribution, namely Debian, so we decided to write our own script.
 As Debian has default package for the mapnik style and rendering/serving
 tiles, the script is more simplier than the Ubuntu version
 
+The uses tools are
+
+    -Tilestache
+    -Default mapnik style
+    -Postgres
+    -Apache2
+    -Leaflet demo page
+
 ## Debian version
 Only tested under Debian 9 (stretch), some package could be missing under other
 release
+
+## Release
+The script is an early stage and is in a work in progress sate, but it work well
+in default context (barbone Debian Stretch install).
 
 ## Script usage
 <code>
