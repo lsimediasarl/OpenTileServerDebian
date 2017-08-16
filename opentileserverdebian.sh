@@ -170,8 +170,9 @@ cat > /etc/cron.daily/osm-update <<EOF
 # Switch to osm user
 su ${OSM_USER} <<CRONEOF
 cd /home/${OSM_USER}/OpenStreetMap
-while [ \$(cat state.txt | grep '^sequenceNumber=') != \$(curl -sL ${UPDATE_URL}/state.txt | grep '^sequenceNumber=') ]
-    echo "--- Updating data (Local: \$(cat state.txt | grep '^sequenceNumber='), Online: \$(curl -sL ${UPDATE_URL}/state.txt | grep '^sequenceNumber='))"
+while [ \$(cat /home/${OSM_USER}/OpenStreetMap/state.txt | grep '^sequenceNumber=') != \$(curl -sL ${UPDATE_URL}/state.txt | grep '^sequenceNumber=') ]
+do    
+    echo "--- Updating data (Local: \$(cat /home/${OSM_USER}/OpenStreetMap/state.txt | grep '^sequenceNumber='), Online: \$(curl -sL ${UPDATE_URL}/state.txt | grep '^sequenceNumber='))"
     osmosis --read-replication-interval --simplify-change --write-xml-change changes.osc.gz
     # Get available memory just before we call osm2pgsql!
     let C_MEM=\$(free -m | grep -i 'mem:' | sed 's/[ \t]\+/ /g' | cut -f4,7 -d' ' | tr ' ' '+')-200
