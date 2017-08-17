@@ -21,6 +21,7 @@
 # Example
 # ./opentileserverdebian.sh http://download.geofabrik.de/north-america/us/delaware-latest.osm.pbf
 # ./opentileserverdebian.sh http://download.geofabrik.de/europe/switzerland-latest.osm.pbf
+# ./opentileserverdebian.sh https://planet.openstreetmap.org/pbf/planet-latest.osm.pbf
 #
 # Licence
 #
@@ -49,7 +50,8 @@ VHOST=$(hostname -f)
 PBF_URL=${1}
 PBF_FILE="/home/${OSM_USER}/OpenStreetMap/${PBF_URL##*/}"
 UPDATE_URL="$(echo ${PBF_URL} | sed 's/latest.osm.pbf/updates/')"
-if [[ ${PBF_URL} =~ "planet.openstreetmap.orf" ]]; then
+if [[ ${PBF_URL} =~ "planet" ]]; then
+    # For planet file, hard code the update url
     UPDATE_URL = "http://planet.openstreetmap.org/replication/day"
 fi
 NP=$(grep -c 'model name' /proc/cpuinfo)
@@ -164,7 +166,7 @@ osm2pgsql --slim -d ${OSM_DB} -C ${C_MEM} --number-processes ${NP} --hstore -S /
 #rm ${PBF_FILE}
 EOF
 
-# Prepare the daily cron job
+# Prepare the daily cron job for data update
 cat > /etc/cron.daily/osm-update <<EOF
 #!/bin/bash
 # Switch to osm user
@@ -189,7 +191,7 @@ chmod +x /etc/cron.daily/osm-update
 #-------------------------------------------------------------------------------
 echo ""
 echo "5. Configure tilestache and apache"
-echo "===================================="
+echo "=================================="
 echo "Create default tilestache config file"
 cat > /etc/tilestache.cfg <<EOF
 {
@@ -271,12 +273,37 @@ cat > /var/www/html/index.html <<EOF
   var map = L.map('map').setView([0, 0], 1);
   
   // load a tile layer
-  L.tileLayer('http://${VHOST}/osm_tiles/{z}/{x}/{y}.png',
+  var color = L.tileLayer('http://${VHOST}/osm_tiles/{z}/{x}/{y}.png',
     {
       attribution: 'Tiles by <a href="http://www.openstreetmap.org">OpenStreetMap</a>',
       maxZoom: 18,
       minZoom: 1
-    }).addTo(map);
+    });
+  color.addTo(map);
+
+  var grey = L.tileLayer('http://${VHOST}/osm_tiles_grey/{z}/{x}/{y}.png',
+    {
+      attribution: 'Tiles by <a href="http://www.openstreetmap.org">OpenStreetMap</a>',
+      maxZoom: 18,
+      minZoom: 1
+    });
+  
+  var proxy = L.tileLayer('http://${VHOST}/proxy/{z}/{x}/{y}.png',
+    {
+      attribution: 'Tiles by <a href="http://www.openstreetmap.org">OpenStreetMap</a>',
+      maxZoom: 18,
+      minZoom: 1
+    });
+  
+  var baseMaps = {
+    "color": color,
+    "grey": grey,
+    "proxy": proxy
+  };
+
+  var overlays = { };
+
+  L.control.layers(baseMaps,overlays, { "collapsed": false }).addTo(map);
 
   </script>
 </body>
