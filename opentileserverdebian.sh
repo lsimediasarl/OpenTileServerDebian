@@ -257,7 +257,7 @@ echo "Prepare the demo leaflet page"
 cat > /var/www/html/index.html <<EOF
 <html>
 <head>
-  <title>A Leaflet map!</title>
+  <title>Tile server demo</title>
   <link rel="stylesheet" href="/javascript/leaflet/leaflet.css"/>
   <script src="/javascript/leaflet/leaflet.js"></script>
   <style>
