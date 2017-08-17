@@ -106,7 +106,8 @@ apt install -y -q ttf-unifont \
 #--- prepare the answer for database and automatic download of shape files
 echo "openstreetmap-carto openstreetmap-carto/database-name string ${OSM_DB}" | debconf-set-selections
 echo "openstreetmap-carto-common openstreetmap-carto/fetch-data boolean true" | debconf-set-selections
-more
+apt install -y openstreetmap-carto
+apt clean
 
 #-------------------------------------------------------------------------------
 #--- 2. Create system user
