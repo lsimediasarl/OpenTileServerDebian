@@ -48,7 +48,7 @@ When the installation is finished, a demo page is available under
 
     http://{HOST}
     
-Change /var/www/html/index.html for the default location
+Change /var/www/html/index.html for fine tuning
 
 The available tile stache alias are
 
