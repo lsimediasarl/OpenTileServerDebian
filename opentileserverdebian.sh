@@ -106,8 +106,7 @@ apt install -y -q ttf-unifont \
 #--- prepare the answer for database and automatic download of shape files
 echo "openstreetmap-carto openstreetmap-carto/database-name string ${OSM_DB}" | debconf-set-selections
 echo "openstreetmap-carto-common openstreetmap-carto/fetch-data boolean true" | debconf-set-selections
-apt install -y openstreetmap-carto
-apt clean
+more
 
 #-------------------------------------------------------------------------------
 #--- 2. Create system user
@@ -126,15 +125,6 @@ fi
 echo ""
 echo "3. Prepare database"
 echo "==================="
-PG_VER=$(pg_config | grep '^VERSION' | cut -f4 -d' ' | cut -f1,2 -d.)
-cat >/etc/postgresql/${PG_VER}/main/pg_hba.conf <<CMD_EOF
-local all all trust
-host all all 127.0.0.1 255.255.255.255 md5
-host all all 0.0.0.0/0 md5
-host all all ::1/128 md5
-CMD_EOF
-service postgresql restart
-
 # Create the database schema (as postgres user)
 su postgres <<EOF
 cd ~
