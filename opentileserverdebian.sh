@@ -109,6 +109,9 @@ echo "openstreetmap-carto-common openstreetmap-carto/fetch-data boolean true" | 
 apt install -y openstreetmap-carto
 apt clean
 
+# To avoid the label cut between tiles, add the avoid-edges in the default style
+sed -i.bkp 's/<ShieldSymbolizer/<ShieldSymbolizer\ avoid-edges=\"true\"\ /g' /usr/share/openstreetmap-carto/style.xml
+
 #-------------------------------------------------------------------------------
 #--- 2. Create system user
 #-------------------------------------------------------------------------------
