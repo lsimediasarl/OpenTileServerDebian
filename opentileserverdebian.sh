@@ -8,7 +8,7 @@
 # Simple tile server installation script with tilestache as main server for Debian
 # Stretch (start with barbone install with ssh server only).
 #
-# This script will install open street data and prepare the tilestache server
+# This script will install open street map data and prepare the tilestache server
 # to render the tiles directly via apache2
 #
 # The database will be stored under the defined user ("osm" by default) and the
@@ -25,7 +25,7 @@
 #
 # Licence
 #
-#    Copyright (C) 2917 LSI Media Sarl
+#    Copyright (C) 2017 LSI Media Sarl
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
