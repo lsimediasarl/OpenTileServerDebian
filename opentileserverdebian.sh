@@ -43,7 +43,7 @@
 
 # Change these values if needed
 OSM_USER="osm" #linux and db user
-OSM_DB="openstreetmap" #database name
+OSM_DB="gis" #database name
 VHOST=$(hostname -f)
 
 # Internal variables
