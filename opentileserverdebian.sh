@@ -111,7 +111,8 @@ apt clean
 
 # To avoid the label cut between tiles, add the avoid-edges in the default style
 sed -i 's/<Map/<Map\ buffer-size=\"512\"\ /g' /usr/share/openstreetmap-carto/style.xml
-sed -i 's/<ShieldSymbolizer/<ShieldSymbolizer\ avoid-edges=\"true\"\ /g' /usr/share/openstreetmap-carto/style.xml
+# This line is not needed for the moment
+#sed -i 's/<ShieldSymbolizer/<ShieldSymbolizer\ avoid-edges=\"true\"\ /g' /usr/share/openstreetmap-carto/style.xml
 
 #-------------------------------------------------------------------------------
 #--- 2. Create system user
