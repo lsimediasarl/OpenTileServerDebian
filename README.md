@@ -18,7 +18,7 @@ Two backend can be installed
 ### Tilestache
 Tilestache is available by default in Debian, so this package is more simplier
 to maintain and install, but it is slower than the mod_tile backend and lack
-interestingfeatures like marking "dirty" tiles to be re-rendered
+interesting features like marking "dirty" tiles to be re-rendered.
 
 The used tools are
 
@@ -34,7 +34,7 @@ in the git source tree of the mod_tile code, so it will be compiled and installe
 as a standard debian package.
 
 This backend is faster than Tilestache, but more complex to install and maintain
-but has the advantage to have many useful features like re-rendering dirty tiles
+but has the advantage to have many useful features like re-rendering dirty tiles.
 
     -mod_tile
     -renderd
@@ -55,7 +55,7 @@ in default context (barbone Debian Stretch install).
     ./opentileserverdebian.sh  {tilestache|mod_tile|none} {pbf_url}
 
     {tilestache|mod_tile|none} The backend to use (if none is specified only the data are imported)
-    {pbf_url}: Complete PBF url from GeoFabrik (or other source)
+    {pbf_url} complete PBF url from GeoFabrik (or other source)
 
 Example
 
