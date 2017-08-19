@@ -236,13 +236,13 @@ tile_dir=/home/${OSM_USER}/www/mod_tile
 plugins_dir=$(mapnik-config --input-plugins)
 font_dir=/usr/share/fonts/truetype
 font_dir_recurse=true
-tile_dir=/home/${OSM_USER}/www/mod_tile
+TILEDIR=/home/${OSM_USER}/www/mod_tile
 
 [default]
 plugins_dir=$(mapnik-config --input-plugins)
 font_dir=/usr/share/fonts/truetype
 font_dir_recurse=true
-tile_dir=/home/${OSM_USER}/www/mod_tile
+TILEDIR=/home/${OSM_USER}/www/mod_tile
 URI=/osm/
 XML=/usr/share/openstreetmap-carto/style.xml
 DESCRIPTION=This is the standard osm mapnik style
