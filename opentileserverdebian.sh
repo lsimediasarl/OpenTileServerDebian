@@ -5,23 +5,23 @@
 # This script is inspired from https://github.com/AcuGIS/OpenTileServer
 # Also inspired by documentation at https://wiki.debian.org/OSM/tileserver/jessie
 #
-# Simple tile server installation script with tilestache as main server for Debian
-# Stretch (start with barbone install with ssh server only).
+# Simple tile server installation script with tilestache or mod_tile as main server
+# for Debian Stretch (start with barbone install with ssh server only).
 #
-# This script will install open street map data and prepare the tilestache server
-# to render the tiles directly via apache2
+# This script will install open street map data and prepare the tilestache/mod_tile
+# server to render the tiles directly via apache2
 #
 # The database will be stored under the defined user ("osm" by default) and the
 # tiles will be stored in the user home at /home/{user}/www/tiles
 #
 # The script must be run as root
 #
-# Usage: ./opentileserverdebian.sh {pbf_url}"
+# Usage: ./opentileserverdebian.sh {tilestache|mod_tile|none} {pbf_url}"
 #
 # Example
-# ./opentileserverdebian.sh http://download.geofabrik.de/north-america/us/delaware-latest.osm.pbf
-# ./opentileserverdebian.sh http://download.geofabrik.de/europe/switzerland-latest.osm.pbf
-# ./opentileserverdebian.sh https://planet.openstreetmap.org/pbf/planet-latest.osm.pbf
+# ./opentileserverdebian.sh tilestache http://download.geofabrik.de/north-america/us/delaware-latest.osm.pbf
+# ./opentileserverdebian.sh mod_tile http://download.geofabrik.de/europe/switzerland-latest.osm.pbf
+# ./opentileserverdebian.sh mod_tile https://planet.openstreetmap.org/pbf/planet-latest.osm.pbf
 #
 # Licence
 #
@@ -46,8 +46,21 @@ OSM_USER="osm" #linux and db user
 OSM_DB="gis" #database name
 VHOST=$(hostname -f)
 
+#-------------------------------------------------------------------------------
+#--- 0. Introduction
+#-------------------------------------------------------------------------------
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $0 {tilestache|mod_tile|none} {pbf_url}"; exit 1;
+fi
+
+# Make sure only root can run our script
+if [ "$(id -u)" != "0" ]; then
+   echo "This script must be run as root";  exit 1;
+fi
+
 # Internal variables
-PBF_URL=${1}
+BACKEND=${1}
+PBF_URL=${2}
 PBF_FILE="/home/${OSM_USER}/OpenStreetMap/${PBF_URL##*/}"
 UPDATE_URL="$(echo ${PBF_URL} | sed 's/latest.osm.pbf/updates/')"
 if [[ ${PBF_URL} =~ "planet" ]]; then
@@ -56,28 +69,21 @@ if [[ ${PBF_URL} =~ "planet" ]]; then
 fi
 NP=$(grep -c 'model name' /proc/cpuinfo)
 
-#-------------------------------------------------------------------------------
-#--- 0. Introduction
-#-------------------------------------------------------------------------------
-if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 {pbf_url}"; exit 1;
-fi
-
-# Make sure only root can run our script
-if [ "$(id -u)" != "0" ]; then
-   echo "This script must be run as root";  exit 1;
-fi
-
 cat <<EOF
 
 The values for the installation are
 User          : ${OSM_USER}
 Database name : ${OSM_DB}
 Server name   : ${VHOST}
+Backend       : ${BACKEND}
 PBF URL       : ${PBF_URL}
 To change these values, edit the script file
 
 If the values are not correct, break this script (CTRL-C) now or wait 10s to continue
+
+Some package will ask you some question, answer with the default values which
+have been modified to represent your values.
+
 EOF
 sleep 10s
 
@@ -87,7 +93,7 @@ sleep 10s
 echo ""
 echo "1. Install needed packages"
 echo "=========================="
-export DEBIAN_FRONTEND=noninteractive
+#export DEBIAN_FRONTEND=noninteractive
 apt install -y -q ttf-unifont \
     fonts-arphic-ukai \
     fonts-arphic-uming \
@@ -100,7 +106,6 @@ apt install -y -q ttf-unifont \
     osmosis \
     apache2 \
     libapache2-mod-wsgi \
-    tilestache \
     javascript-common \
     libjs-leaflet
 #--- prepare the answer for database and automatic download of shape files
@@ -183,18 +188,83 @@ EOF
 chmod +x /etc/cron.daily/osm-update
 
 #-------------------------------------------------------------------------------
-#--- 5. Configure tilestache
+#--- 5. Configure backend
 #-------------------------------------------------------------------------------
 echo ""
-echo "5. Configure tilestache and apache"
-echo "=================================="
-echo "Create default tilestache config file"
-cat > /etc/tilestache.cfg <<EOF
+echo "5. Preparing backend"
+echo "===================="
+if [ ${BACKEND} = "mod_tile" ]; then
+    #---Configure mod_tile and renderd
+    echo "Configure mod_tile,renderd and apache"
+    apt install -y git build-essential \
+         fakeroot \
+         devscripts \
+         apache2-dev \
+         libmapnik-dev
+
+    # Clone and compile mod_tile
+    git clone https://github.com/openstreetmap/mod_tile.git
+    cd mod_tile
+    dpkg-buildpackage -i -b -uc -us
+    cd ..
+    # Install build packages
+    dpkg -i renderd_*.deb
+    dpkg -i libapache2-mod-tile_*.deb
+    rm *.deb
+    rm libapache2-mod-tile*.*
+
+    echo "Configure renderd"
+    cat > /etc/default/renderd <<EOF
+# Override some default value
+RUNASUSER=${OSM_USER}
+#DAEMON_ARGS=""
+EOF
+
+    mkdir -p /var/run/renderd
+    chmod og+w /var/run/renderd
+    mkdir -p /home/${OSM_USER}/www/mod_tile
+    chown -R ${OSM_USER} /home/${OSM_USER}/www
+    chgrp -R ${OSM_USER} /home/${OSM_USER}/www
+    cat > /etc/renderd.conf <<EOF
+[renderd]
+stats_file=/var/run/renderd/renderd.stats
+socketname=/var/run/renderd/renderd.sock
+num_threads=${NP}
+tile_dir=/home/${OSM_USER}/www/mod_tile
+
+[mapnik]
+plugins_dir=$(mapnik-config --input-plugins)
+font_dir=/usr/share/fonts/truetype
+font_dir_recurse=true
+tile_dir=/home/${OSM_USER}/www/mod_tile
+
+[default]
+plugins_dir=$(mapnik-config --input-plugins)
+font_dir=/usr/share/fonts/truetype
+font_dir_recurse=true
+tile_dir=/home/${OSM_USER}/www/mod_tile
+URI=/osm/
+XML=/usr/share/openstreetmap-carto/style.xml
+DESCRIPTION=This is the standard osm mapnik style
+;ATTRIBUTION=&copy;<a href=\"http://www.openstreetmap.org/\">OpenStreetMap</a> and <a href=\"http://wiki.openstreetmap.org/wiki/Contributors\">contributors</a>, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>
+;HOST=tile.openstreetmap.org
+;SERVER_ALIAS=http://a.tile.openstreetmap.org
+;SERVER_ALIAS=http://b.tile.openstreetmap.org
+;HTCPHOST=proxy.openstreetmap.org
+EOF
+
+    service renderd restart
+
+elif [ ${BACKEND} = "tilestache" ]; then
+    echo "Configure tilestache and apache"
+    apt install -y tilestache
+
+    cat > /etc/tilestache.cfg <<EOF
 {
   "cache":
   {
     "name": "Disk",
-    "path": "/home/${OSM_USER}/www/tiles",
+    "path": "/home/${OSM_USER}/www/tilestache",
     "umask": "0022",
     "dirs": "portable"
   },
@@ -206,13 +276,13 @@ cat > /etc/tilestache.cfg <<EOF
         "png options": {"palette": "http://tilestache.org/example-palette-openstreetmap-mapnik.act"},
         "cache lifespan": 2592000
     },
-    "osm_tiles":
+    "osm":
     {
         "provider" : { "name": "mapnik", "mapfile": "/usr/share/openstreetmap-carto/style.xml" },
         "preview":  { "lat": 0.0,  "lon": 0.0, "zoom": 1, "ext": "png" },
         "cache lifespan": 86400
     },
-    "osm_tiles_grey":
+    "osm_grey":
     {
         "provider" : { "name": "mapnik", "mapfile": "/usr/share/openstreetmap-carto/style.xml" },
         "preview":  { "lat": 0.0,  "lon": 0.0, "zoom": 1, "ext": "png" },
@@ -224,32 +294,40 @@ cat > /etc/tilestache.cfg <<EOF
   "logging": "info"
 }
 EOF
-
-echo "Create default wsgi file"
-cat > /var/www/tilestache.wsgi <<EOF
+    echo "Create default wsgi file"
+    cat > /var/www/tilestache.wsgi <<EOF
 #!/usr/bin/python
 import os, TileStache
 application = TileStache.WSGITileServer('/etc/tilestache.cfg')
 EOF
 
-echo "Create a new virtual host"
-cat > /etc/apache2/sites-available/tilestache.conf <<EOF
+    echo "Create a new virtual host"
+    cat > /etc/apache2/sites-available/tilestache.conf <<EOF
 <VirtualHost *:80>
-	ServerName ${VHOST}
-	#ServerAlias tile
+    ServerName ${VHOST}
+    #ServerAlias tile
 
-	DocumentRoot /var/www/html
+    DocumentRoot /var/www/html
 
-	ErrorLog \${APACHE_LOG_DIR}/error.log
-	CustomLog \${APACHE_LOG_DIR}/access.log combined
+    ErrorLog \${APACHE_LOG_DIR}/error.log
+    CustomLog \${APACHE_LOG_DIR}/access.log combined
 
-	WSGIDaemonProcess tilestache processes=1 maximum-requests=500 threads=10 user=${OSM_USER}
+    WSGIDaemonProcess tilestache processes=${NP} maximum-requests=500 threads=10 user=${OSM_USER}
     WSGIProcessGroup tilestache
-	WSGIScriptAlias / /var/www/tilestache.wsgi
+    WSGIScriptAlias / /var/www/tilestache.wsgi
 </VirtualHost>
 EOF
 
-echo "Prepare the demo leaflet page"
+else
+    echo "No backend installed, only data imported"
+
+fi
+
+echo ""
+echo "5. Installing demo pages"
+echo "========================"
+if [ ${BACKEND} = "tilestache" ]; then
+    echo "Prepare the demo leaflet page"
 cat > /var/www/html/index.html <<EOF
 <html>
 <head>
@@ -269,7 +347,7 @@ cat > /var/www/html/index.html <<EOF
   var map = L.map('map').setView([0, 0], 1);
   
   // load a tile layer
-  var color = L.tileLayer('http://${VHOST}/osm_tiles/{z}/{x}/{y}.png',
+  var color = L.tileLayer('/osm/{z}/{x}/{y}.png',
     {
       attribution: 'Tiles by <a href="http://www.openstreetmap.org">OpenStreetMap</a>',
       maxZoom: 18,
@@ -277,14 +355,14 @@ cat > /var/www/html/index.html <<EOF
     });
   color.addTo(map);
 
-  var grey = L.tileLayer('http://${VHOST}/osm_tiles_grey/{z}/{x}/{y}.png',
+  var grey = L.tileLayer('/osm_grey/{z}/{x}/{y}.png',
     {
       attribution: 'Tiles by <a href="http://www.openstreetmap.org">OpenStreetMap</a>',
       maxZoom: 18,
       minZoom: 1
     });
   
-  var proxy = L.tileLayer('http://${VHOST}/proxy/{z}/{x}/{y}.png',
+  var proxy = L.tileLayer('/proxy/{z}/{x}/{y}.png',
     {
       attribution: 'Tiles by <a href="http://www.openstreetmap.org">OpenStreetMap</a>',
       maxZoom: 18,
@@ -306,15 +384,12 @@ cat > /var/www/html/index.html <<EOF
 </html>
 EOF
 
-echo "Disable default virtual host"
-a2dissite 000-default
-echo "Enable tilestache host"
-a2ensite tilestache
-service apache2 restart
+    echo "Disable default virtual host"
+    a2dissite 000-default
+    echo "Enable tilestache host"
+    a2ensite tilestache
 
-cat <<EOF
-============================================
-Installation is finished
+    cat <<EOF
 
 You can find your an example at (leaflet)
 http://${VHOST}
@@ -323,15 +398,36 @@ Change /var/www/html/index.html for the default location
 The available tile stache alias are
 
 Mapnik default style
-http://${VHOST}/osm_tiles
-http://${VHOST}/osm_tiles_grey
+http://${VHOST}/osm
+http://${VHOST}/osm_grey
 
 Proxy to tile.openstreetmap.ch
 http://${VHOST}/proxy
 
 The rendered/downloaded tiles are stored in
-/home/${OSM_USER}/www/tiles
+/home/${OSM_USER}/www/tilestache
 
 The main tilestache config is
 /etc/tilestache.cfg
+
 EOF
+
+elif [ ${BACKEND} = "mod_tile" ]; then
+    cat <<EOF
+
+You can find your an example at
+http://${VHOST}/osm
+
+The rendered/downloaded tiles are stored in
+/home/${OSM_USER}/www/mod_tile
+
+The main renderd config is
+/etc/renderd.cfg
+EOF
+
+else
+    echo "No backend installed"
+fi
+
+service apache2 restart
+echo "--- Finished installation"
