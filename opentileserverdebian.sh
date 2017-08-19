@@ -12,7 +12,7 @@
 # server to render the tiles directly via apache2
 #
 # The database will be stored under the defined user ("osm" by default) and the
-# tiles will be stored in the user home at /home/{user}/www/tiles
+# tiles will be stored in the user home at /var/lib/mod_tile and /var/lib/tilestache
 #
 # The script must be run as root
 #
@@ -222,27 +222,27 @@ EOF
 
     mkdir -p /var/run/renderd
     chmod og+w /var/run/renderd
-    mkdir -p /home/${OSM_USER}/www/mod_tile
-    chown -R ${OSM_USER} /home/${OSM_USER}/www
-    chgrp -R ${OSM_USER} /home/${OSM_USER}/www
+    mkdir -p /var/lib/mod_tile
+    chmod og+w /var/lib/mod_tile
+    
     cat > /etc/renderd.conf <<EOF
 [renderd]
 stats_file=/var/run/renderd/renderd.stats
 socketname=/var/run/renderd/renderd.sock
 num_threads=${NP}
-tile_dir=/home/${OSM_USER}/www/mod_tile
+tile_dir=/var/lib/mod_tile
 
 [mapnik]
 plugins_dir=$(mapnik-config --input-plugins)
 font_dir=/usr/share/fonts/truetype
 font_dir_recurse=true
-TILEDIR=/home/${OSM_USER}/www/mod_tile
+;TILEDIR=/home/${OSM_USER}/www/mod_tile
 
 [default]
 plugins_dir=$(mapnik-config --input-plugins)
 font_dir=/usr/share/fonts/truetype
 font_dir_recurse=true
-TILEDIR=/home/${OSM_USER}/www/mod_tile
+;TILEDIR=/home/${OSM_USER}/www/mod_tile
 URI=/osm/
 XML=/usr/share/openstreetmap-carto/style.xml
 DESCRIPTION=This is the standard osm mapnik style
@@ -259,12 +259,15 @@ elif [ ${BACKEND} = "tilestache" ]; then
     echo "Configure tilestache and apache"
     apt install -y tilestache
 
+    mkdir -p /var/lib/tilestache
+    chmod og+w /var/lib/tilestache
+
     cat > /etc/tilestache.cfg <<EOF
 {
   "cache":
   {
     "name": "Disk",
-    "path": "/home/${OSM_USER}/www/tilestache",
+    "path": "/var/lib/tilestache",
     "umask": "0022",
     "dirs": "portable"
   },
@@ -405,7 +408,7 @@ Proxy to tile.openstreetmap.ch
 http://${VHOST}/proxy
 
 The rendered/downloaded tiles are stored in
-/home/${OSM_USER}/www/tilestache
+/var/lib/tilestache
 
 The main tilestache config is
 /etc/tilestache.cfg
@@ -419,10 +422,11 @@ You can find your an example at
 http://${VHOST}/osm
 
 The rendered/downloaded tiles are stored in
-/home/${OSM_USER}/www/mod_tile
+/var/lib/mod_tile
 
 The main renderd config is
 /etc/renderd.cfg
+/etc/default/renderd
 EOF
 
 else
