@@ -59,8 +59,7 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 # Internal variables
-BACKEND=${1}
-PBF_URL=${2}
+PBF_URL=${1}
 PBF_FILE="/home/${OSM_USER}/OpenStreetMap/${PBF_URL##*/}"
 UPDATE_URL="$(echo ${PBF_URL} | sed 's/latest.osm.pbf/updates/')"
 if [[ ${PBF_URL} =~ "planet" ]]; then
