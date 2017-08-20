@@ -74,7 +74,7 @@ The values for the installation are
 User          : ${OSM_USER}
 Database name : ${OSM_DB}
 Server name   : ${VHOST}
-Backend       : ${BACKEND}
+Backend       : mod_tile
 PBF URL       : ${PBF_URL}
 To change these values, edit the script file
 
