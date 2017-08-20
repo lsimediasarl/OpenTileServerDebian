@@ -59,8 +59,7 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 # Internal variables
-BACKEND=${1}
-PBF_URL=${2}
+PBF_URL=${1}
 PBF_FILE="/home/${OSM_USER}/OpenStreetMap/${PBF_URL##*/}"
 UPDATE_URL="$(echo ${PBF_URL} | sed 's/latest.osm.pbf/updates/')"
 if [[ ${PBF_URL} =~ "planet" ]]; then
@@ -75,7 +74,7 @@ The values for the installation are
 User          : ${OSM_USER}
 Database name : ${OSM_DB}
 Server name   : ${VHOST}
-Backend       : ${BACKEND}
+Backend       : tilestache
 PBF URL       : ${PBF_URL}
 To change these values, edit the script file
 
