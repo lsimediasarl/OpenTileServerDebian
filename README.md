@@ -51,17 +51,20 @@ The script is an early stage and is in a work in progress sate, but it work well
 in default context (barbone Debian Stretch install).
 
 ## Script usage
-<code>
-    ./opentileserverdebian.sh  {tilestache|mod_tile|none} {pbf_url}
+Two script are available, one for each backend, choose the wanted one and then
+execute it
 
-    {tilestache|mod_tile|none} The backend to use (if none is specified only the data are imported)
+<code>
+
+    ./opentileserver_{backend}.sh {pbf_url}
+
     {pbf_url} complete PBF url from GeoFabrik (or other source)
 
 Example
 
-    ./opentileserverdebian.sh tilestache tilestache http://download.geofabrik.de/north-america/us/delaware-latest.osm.pbf
-    ./opentileserverdebian.sh mod_tile http://download.geofabrik.de/europe/switzerland-latest.osm.pbf
-    ./opentileserverdebian.sh none http://download.geofabrik.de/europe/switzerland-latest.osm.pbf
+    ./opentileserver_stache.sh http://download.geofabrik.de/north-america/us/delaware-latest.osm.pbf
+    ./opentileserver_mod.sh http://download.geofabrik.de/europe/switzerland-latest.osm.pbf
+    
 </code>
 
 ## OSM data update
