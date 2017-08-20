@@ -50,7 +50,7 @@ VHOST=$(hostname -f)
 #--- 0. Introduction
 #-------------------------------------------------------------------------------
 if [ "$#" -ne 2 ]; then
-    echo "Usage: $0 pbf_url}"; exit 1;
+    echo "Usage: $0 {pbf_url}"; exit 1;
 fi
 
 # Make sure only root can run our script
