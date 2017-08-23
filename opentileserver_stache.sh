@@ -180,8 +180,8 @@ do
     # Get available memory just before we call osm2pgsql!
     let C_MEM=\\\$(free -m | grep -i 'mem:' | sed 's/[ \t]\+/ /g' | cut -f4,7 -d' ' | tr ' ' '+')-200
     osm2pgsql --append --slim -d ${OSM_DB} -C \\\${C_MEM} --number-processes ${NP} -e15 -o expire.list --hstore changes.osc.gz
-    sleep 2s
-    # Note: tilestache as not mecanism to mark dirty tiles
+    sleep 60s
+    # Note: tilestache as no mecanism to mark dirty tiles
 done
 echo "--- Data is up to date."
 CRONEOF

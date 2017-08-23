@@ -188,7 +188,7 @@ do
     # If the mod_tile is used, the render_expired command exist and use it to
     # mark dirty tile (will be re-render again)
     cat expire.list | render_expired --min-zoom=15 --touch-from=15 >/dev/null
-    sleep 2s
+    sleep 60s
 done
 echo "--- Data is up to date."
 CRONEOF
