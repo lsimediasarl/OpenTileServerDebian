@@ -1,6 +1,6 @@
 #!/bin/bash
-# Version: 0.9.0
-# Date   : 2017-08-16
+# Version: 0.9.1
+# Date   : 2018-04-03
 #
 # This script is inspired from https://github.com/AcuGIS/OpenTileServer
 # Also inspired by documentation at https://wiki.debian.org/OSM/tileserver/jessie
@@ -64,7 +64,7 @@ PBF_FILE="/home/${OSM_USER}/OpenStreetMap/${PBF_URL##*/}"
 UPDATE_URL="$(echo ${PBF_URL} | sed 's/latest.osm.pbf/updates/')"
 if [[ ${PBF_URL} =~ "planet" ]]; then
     # For planet file, hard code the update url
-    UPDATE_URL = "http://planet.openstreetmap.org/replication/day"
+    UPDATE_URL = "https://planet.openstreetmap.org/replication/day"
 fi
 NP=$(grep -c 'model name' /proc/cpuinfo)
 
@@ -285,7 +285,7 @@ var map = L.map('map').setView([0, 0], 1);
 // load a tile layer
 var color = L.tileLayer('/osm/{z}/{x}/{y}.png',
 {
-  attribution: 'Tiles by <a href="http://www.openstreetmap.org">OpenStreetMap</a>',
+  attribution: 'Tiles by <a href="https://www.openstreetmap.org">OpenStreetMap</a>',
   maxZoom: 18,
   minZoom: 1
 });
@@ -293,14 +293,14 @@ color.addTo(map);
 
 var grey = L.tileLayer('/osm_grey/{z}/{x}/{y}.png',
 {
-  attribution: 'Tiles by <a href="http://www.openstreetmap.org">OpenStreetMap</a>',
+  attribution: 'Tiles by <a href="https://www.openstreetmap.org">OpenStreetMap</a>',
   maxZoom: 18,
   minZoom: 1
 });
 
 var proxy = L.tileLayer('/proxy/{z}/{x}/{y}.png',
 {
-  attribution: 'Tiles by <a href="http://www.openstreetmap.org">OpenStreetMap</a>',
+  attribution: 'Tiles by <a href="https://www.openstreetmap.org">OpenStreetMap</a>',
   maxZoom: 18,
   minZoom: 1
 });

@@ -1,6 +1,6 @@
 #!/bin/bash
-# Version: 0.9.0
-# Date   : 2017-08-16
+# Version: 0.9.1
+# Date   : 2018-04-03
 #
 # This script is inspired from https://github.com/AcuGIS/OpenTileServer
 # Also inspired by documentation at https://wiki.debian.org/OSM/tileserver/jessie
@@ -64,7 +64,7 @@ PBF_FILE="/home/${OSM_USER}/OpenStreetMap/${PBF_URL##*/}"
 UPDATE_URL="$(echo ${PBF_URL} | sed 's/latest.osm.pbf/updates/')"
 if [[ ${PBF_URL} =~ "planet" ]]; then
     # For planet file, hard code the update url
-    UPDATE_URL = "http://planet.openstreetmap.org/replication/day"
+    UPDATE_URL = "https://planet.openstreetmap.org/replication/day"
 fi
 NP=$(grep -c 'model name' /proc/cpuinfo)
 
@@ -248,10 +248,10 @@ font_dir_recurse=true
 URI=/osm/
 XML=/usr/share/openstreetmap-carto/style.xml
 DESCRIPTION=This is the standard osm mapnik style
-;ATTRIBUTION=&copy;<a href=\"http://www.openstreetmap.org/\">OpenStreetMap</a> and <a href=\"http://wiki.openstreetmap.org/wiki/Contributors\">contributors</a>, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>
+;ATTRIBUTION=&copy;<a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> and <a href=\"http://wiki.openstreetmap.org/wiki/Contributors\">contributors</a>, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>
 ;HOST=tile.openstreetmap.org
-;SERVER_ALIAS=http://a.tile.openstreetmap.org
-;SERVER_ALIAS=http://b.tile.openstreetmap.org
+;SERVER_ALIAS=https://a.tile.openstreetmap.org
+;SERVER_ALIAS=https://b.tile.openstreetmap.org
 ;HTCPHOST=proxy.openstreetmap.org
 EOF
 

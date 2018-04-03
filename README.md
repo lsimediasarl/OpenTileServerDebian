@@ -47,8 +47,7 @@ Only tested under Debian 9 (stretch), some packages could be missing under other
 releases
 
 ## Release
-The script is an early stage and is in a work in progress sate, but it work well
-in default context (barbone Debian Stretch install).
+The script is quit tested and it works well in default context (barbone Debian Stretch install).
 
 ## Script usage
 Two script are available, one for each backend, choose the wanted one and then
