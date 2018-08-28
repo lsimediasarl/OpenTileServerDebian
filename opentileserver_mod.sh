@@ -93,7 +93,7 @@ echo ""
 echo "1. Install needed packages"
 echo "=========================="
 #export DEBIAN_FRONTEND=noninteractive
-apt install -y -q ttf-unifont \
+apt install --install-recommends -y -q ttf-unifont \
     fonts-arphic-ukai \
     fonts-arphic-uming \
     fonts-thai-tlwg \
