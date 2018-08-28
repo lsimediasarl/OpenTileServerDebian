@@ -209,9 +209,12 @@ git clone https://github.com/openstreetmap/mod_tile.git
 cd mod_tile
 dpkg-buildpackage -i -b -uc -us
 cd ..
+# Prepare default answer to activate new apache module
+echo "libapache2-mod-tile	libapache2-mod-tile/enablesite	boolean	true" | debconf-set-selections
 # Install build packages
 dpkg -i renderd_*.deb
 dpkg -i libapache2-mod-tile_*.deb
+# Clean it
 rm *.deb
 rm libapache2-mod-tile*.*
 
