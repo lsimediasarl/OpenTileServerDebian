@@ -1,6 +1,6 @@
 #!/bin/bash
-# Version: 0.9.1
-# Date   : 2018-04-03
+# Version: 0.9.2
+# Date   : 2018-08-28
 #
 # This script is inspired from https://github.com/AcuGIS/OpenTileServer
 # Also inspired by documentation at https://wiki.debian.org/OSM/tileserver/jessie
